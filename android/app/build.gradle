@@ -1,0 +1,83 @@
+apply plugin: "com.android.application"
+apply plugin: "org.jetbrains.kotlin.android"
+apply plugin: "com.facebook.react"
+
+react {
+    entryFile = file(["node", "--print", "require.resolve('expo/AppEntry.js')"]).text.trim()
+    reactNativeDir = new File(["node", "--print", "require.resolve('react-native/package.json')"]).text.trim()).getParentFile().getAbsoluteFile()
+    hermesCommand = new File(["node", "--print", "require.resolve('react-native/package.json')"]).text.trim()).getParentFile().getAbsolutePath() + "/sdks/hermesc/%OS-BIN%/hermesc"
+    codegenDir = new File(["node", "--print", "require.resolve('@react-native/codegen/package.json', { paths: [require.resolve('react-native/package.json')] })"]).text.trim()).getParentFile().getAbsoluteFile()
+    
+    // OpenCV configuration
+    enableHermes = true
+    enableProGuardInReleaseBuilds = false
+}
+
+android {
+    ndkVersion rootProject.ext.ndkVersion
+    compileSdkVersion rootProject.ext.compileSdkVersion
+
+    namespace 'com.confidencecoach.app'
+    defaultConfig {
+        applicationId 'com.confidencecoach.app'
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName "1.0.0"
+        
+        // OpenCV configuration
+        ndk {
+            abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64'
+        }
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+    }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+        }
+        release {
+            signingConfig signingConfigs.debug
+            minifyEnabled enableProGuardInReleaseBuilds
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    
+    // React Native
+    implementation("com.facebook.react:react-android")
+    implementation("com.facebook.react:flipper-integration")
+    
+    // OpenCV
+    implementation 'org.opencv:opencv-android:4.8.0'
+    
+    // MediaPipe
+    implementation 'com.google.mediapipe:tasks-vision:0.10.0'
+    implementation 'com.google.mediapipe:tasks-audio:0.10.0'
+    
+    // Camera and audio
+    implementation 'androidx.camera:camera-core:1.3.0'
+    implementation 'androidx.camera:camera-camera2:1.3.0'
+    implementation 'androidx.camera:camera-lifecycle:1.3.0'
+    implementation 'androidx.camera:camera-view:1.3.0'
+
+    if (hermesEnabled.toBoolean()) {
+        implementation("com.facebook.react:hermes-android")
+    } else {
+        implementation jscFlavor
+    }
+}
+
+apply from: new File(["node", "--print", "require.resolve('@react-native-community/cli-platform-android/package.json', { paths: [require.resolve('react-native/package.json')] })"].execute(null, rootDir).text.trim(), "../native_modules.gradle");
+applyNativeModulesAppBuildGradle(project)

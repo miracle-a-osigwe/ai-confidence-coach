@@ -1,0 +1,43 @@
+require File.join(File.dirname(`node --print "require.resolve('expo/package.json')"`), "scripts/autolinking")
+
+platform :ios, '13.0'
+prepare_react_native_project!
+
+# OpenCV configuration
+$OpenCVVersion = "4.8.0"
+
+target 'ConfidenceCoach\' do
+  use_expo_modules!
+  config = use_native_modules!
+
+  use_react_native!(
+    :path => config[:reactNativePath],
+    :hermes_enabled => true,
+    :fabric_enabled => flags[:fabric_enabled],
+    :app_clip => false
+  )
+
+  # OpenCV pod
+  pod 'OpenCV', '~> 4.8.0'
+  
+  # MediaPipe pods
+  pod 'MediaPipeTasksVision', '~> 0.10.0'
+  pod 'MediaPipeTasksAudio', '~> 0.10.0'
+
+  post_install do |installer|
+    react_native_post_install(
+      installer,
+      config[:reactNativePath],
+      :mac_catalyst_enabled => false
+    )
+    
+    # OpenCV configuration
+    installer.pods_project.targets.each do |target|
+      if target.name == 'OpenCV'
+        target.build_configurations.each do |config|
+          config.build_settings['ENABLE_BITCODE'] = 'NO'
+        end
+      end
+    end
+  end
+end

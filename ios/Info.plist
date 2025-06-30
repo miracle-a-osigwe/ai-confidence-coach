@@ -1,0 +1,4 @@
+<key>NSCameraUsageDescription</key>
+<string>Confidence AI Coach needs access to your camera to analyze your body language and provide real-time feedback.</string>
+<key>NSMicrophoneUsageDescription</key>
+<string>Confidence AI Coach needs access to your microphone to analyze your voice and provide real-time feedback.</string>
