@@ -557,6 +557,8 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 For questions or support, please contact the development team or create an issue in the repository.
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/16de4f06-7692-4905-b84d-c1b31ed83153/deploy-status)](https://app.netlify.com/projects/confidence-coach/deploys)
+
 ---
 
 **Ready for Production**: This app is designed with production-ready architecture, comprehensive error handling, and scalable computer vision integration. The native development setup enables full OpenCV and MediaPipe capabilities for professional-grade confidence coaching.
